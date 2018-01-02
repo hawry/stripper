@@ -1,4 +1,14 @@
 // Package stripper provides functions to remove values from specified struct fields, e.g. to reduce the risk of sending protected attributes in a JSON-response in an API.
+//
+// Use this package if you wish to still be able to easily perform an unmarshalling of a JSON-string to a struct, but still wanting to be able to prevent sensitive data to be Marshalled by mistake.
+//
+// Examples of struct field tags and their meanings:
+//  // Field will be set to the Zero value (reflect.Zero)
+//  Field int `clean:"true"`
+//
+//  // Nested Struct will also be checked (as specified by those struct field tags)
+//  Field Struct `clean:"true"`
+// All other values than 'true' will make the cleaner ignore that field
 package stripper
 
 import (
@@ -10,14 +20,6 @@ import (
 const tagName = "clean"
 
 //Marshal removes (setting to default Zero value) any data on struct fields with the tag `clean:"true"` on them, but leaves the rest, and then calls json.Marshal
-//
-// Examples of struct field tags and their meanings:
-//  // Field will be set to the Zero value (reflect.Zero)
-//  Field int `clean:"true"`
-//
-//  // Nested Struct will also be checked (as specified by those struct field tags)
-//  Field Struct `clean:"true"`
-// All other values than 'true' will make the cleaner ignore that field
 func Marshal(a interface{}) ([]byte, error) {
 	v := reflect.ValueOf(a)
 	if v.Kind() != reflect.Ptr {
